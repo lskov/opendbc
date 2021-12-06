@@ -1368,6 +1368,13 @@ BO_ 391 EV_Gearshift: 8 XXX
  SG_ GearPosition : 16|4@1+ (1,0) [0|255] "" XXX
  SG_ RegenBrakingMode : 12|2@1+ (1,0) [0|3] "" XXX
 
+BO_ 679 ACC_13: 8 XXX
+ SG_ Unknown_Status : 12|4@1+ (1,0) [0|7] ""  XXX
+ SG_ Unknown_Osc_1 : 16|8@1+ (1,0) [0|255] ""  XXX
+ SG_ Unknown_Osc_2 : 24|8@1+ (1,0) [0|255] ""  XXX
+ SG_ ACC_Engaged : 58|1@1+ (1,0) [0|1] ""  XXX
+
+
 CM_ SG_ 134 LWI_Lenkradwinkel "Steering angle WITH variable ratio effect included";
 CM_ SG_ 159 EPS_HCA_Status "Status of Heading Control Assist feature";
 CM_ SG_ 159 EPS_Lenkmoment "Steering input by driver, torque";
