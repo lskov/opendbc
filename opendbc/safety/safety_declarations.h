@@ -52,7 +52,7 @@
     (config).tx_msgs = (tx); \
     (config).tx_msgs_len = sizeof((tx)) / sizeof((tx)[0]); \
     (config).disable_forwarding = false; \
-  } while(0);
+  } while (0);
 
 #define UPDATE_VEHICLE_SPEED(val_ms) (update_sample(&vehicle_speed, ROUND((val_ms) * VEHICLE_SPEED_FACTOR)))
 
@@ -65,6 +65,12 @@ extern const int MAX_WRONG_COUNTERS;
 #define VEHICLE_SPEED_FACTOR 1000.0
 #define MAX_TORQUE_RT_INTERVAL 250000U
 
+// Lateral constants
+// ISO 11270
+static const float ISO_LATERAL_ACCEL = 3.0;  // m/s^2
+
+static const float EARTH_G = 9.81;
+static const float AVERAGE_ROAD_ROLL = 0.06;  // ~3.4 degrees, 6% superelevation
 
 // sample struct that keeps 6 samples in memory
 struct sample_t {
@@ -132,6 +138,13 @@ typedef struct {
   const bool enforce_angle_error;        // enables max_angle_error check
   const bool inactive_angle_is_zero;     // if false, enforces angle near meas when disabled (default)
 } AngleSteeringLimits;
+
+// parameters for lateral accel/jerk angle limiting using a simple vehicle model
+typedef struct {
+  const float slip_factor;
+  const float steer_ratio;
+  const float wheelbase;
+} AngleSteeringParams;
 
 typedef struct {
   // acceleration cmd limits
@@ -225,12 +238,15 @@ void gen_crc_lookup_table_16(uint16_t poly, uint16_t crc_lut[]);
 #endif
 bool steer_torque_cmd_checks(int desired_torque, int steer_req, const TorqueSteeringLimits limits);
 bool steer_angle_cmd_checks(int desired_angle, bool steer_control_enabled, const AngleSteeringLimits limits);
+bool steer_angle_cmd_checks_vm(int desired_angle, bool steer_control_enabled, const AngleSteeringLimits limits,
+                               const AngleSteeringParams params);
 bool longitudinal_accel_checks(int desired_accel, const LongitudinalLimits limits);
 bool longitudinal_speed_checks(int desired_speed, const LongitudinalLimits limits);
 bool longitudinal_gas_checks(int desired_gas, const LongitudinalLimits limits);
 bool longitudinal_transmission_rpm_checks(int desired_transmission_rpm, const LongitudinalLimits limits);
 bool longitudinal_brake_checks(int desired_brake, const LongitudinalLimits limits);
 void pcm_cruise_check(bool cruise_engaged);
+void speed_mismatch_check(const float speed_2);
 
 void safety_tick(const safety_config *safety_config);
 
